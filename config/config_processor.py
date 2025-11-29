@@ -49,6 +49,12 @@ class ConfigProcessor:
             self.config.write(configfile)
 
         # Create necessary directories
+        self.mkdir_input_output_folder()
+
+
+
+    def mkdir_input_output_folder(self):
+        """Create input and output folder if it doesn't exist"""
         import_config = self.get_import_config()
         Path(import_config['input_folder']).mkdir(exist_ok=True)
         Path(import_config['processed_folder']).mkdir(parents=True, exist_ok=True)
@@ -69,7 +75,6 @@ class ConfigProcessor:
 
     def get_parallel_config(self) -> Dict[str, Any]:
         config_dict = dict(self.config['PARALLEL'])
-        config_dict['processes'] = int(config_dict['processes'])
         config_dict['threads_per_process'] = int(config_dict['threads_per_process'])
         return config_dict
 

@@ -1,1 +1,1 @@
-required librearies: pandas pyodbc
+required libraries: pandas pyodbc

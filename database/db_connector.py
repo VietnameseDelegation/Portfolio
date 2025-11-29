@@ -1,6 +1,6 @@
 import pyodbc
 import pandas as pd
-from typing import List, Tuple, Optional, Dict, Any
+from typing import Tuple, Optional, Dict
 import logging
 from config.config_processor import ConfigProcessor
 
