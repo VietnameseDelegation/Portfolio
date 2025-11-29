@@ -21,6 +21,7 @@ class DBConnector:
             f"UID={db_config['username']};"
             f"PWD={db_config['password']};"
             f"Trusted_Connection={db_config['trusted_connection']};"
+            f"Encrypt={db_config['encrypt']};"
         )
 
     def get_connection(self):

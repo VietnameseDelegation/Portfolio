@@ -60,7 +60,7 @@ class CSVETLProcessor:
             return
 
         logger.info(f"Found {len(csv_files)} CSV files to process")
-        max_processes = min(self.config_processor.get_parallel_config()['processes'], len(csv_files))
+        max_processes = len(csv_files)
 
         total_success = total_errors = 0
         with ProcessPoolExecutor(max_workers=max_processes) as executor:

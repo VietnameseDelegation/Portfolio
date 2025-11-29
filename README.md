@@ -1,0 +1,1 @@
+required librearies: pandas pyodbc
