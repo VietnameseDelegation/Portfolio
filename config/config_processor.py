@@ -37,7 +37,6 @@ class ConfigProcessor:
         }
 
         self.config['PARALLEL'] = {
-            'processes': '4',
             'threads_per_process': '2'
         }
 
