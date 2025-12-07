@@ -1,6 +1,6 @@
 import pyodbc
 import pandas as pd
-from typing import List, Tuple, Optional, Dict, Any
+from typing import Tuple, Optional, Dict
 import logging
 from config.config_processor import ConfigProcessor
 
@@ -8,9 +8,21 @@ logger = logging.getLogger(__name__)
 
 
 class DBConnector:
+    _instance = None
+
+    def __new__(cls, config):
+        if cls._instance is None:
+            cls._instance = super(DBConnector, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self, config: ConfigProcessor):
+        # Prevent re-running __init__ on subsequent calls
+        if hasattr(self, "_initialized") and self._initialized:
+            return
+
         self.config = config
         self.connection_string = self._build_connection_string()
+        self._initialized = True
 
     def _build_connection_string(self) -> str:
         db_config = self.config.get_database_config()
