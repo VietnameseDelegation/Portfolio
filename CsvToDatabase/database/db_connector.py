@@ -2,25 +2,19 @@ import pyodbc
 import pandas as pd
 from typing import Tuple, Optional, Dict
 import logging
-import threading
 from CsvToDatabase.config.config_processor import ConfigProcessor
 
 logger = logging.getLogger(__name__)
 
 
 class DBConnector:
-    _instance = None
-    _lock = threading.Lock()  # ensures thread safety
-
     def __new__(cls, config):
-        with cls._lock:
-                # Second check (inside lock)
-                if cls._instance is None:
-                    cls._instance = super(DBConnector, cls).__new__(cls)
+        if cls._instance is None:
+            cls._instance = super(DBConnector, cls).__new__(cls)
         return cls._instance
 
     def __init__(self, config: ConfigProcessor):
-        # Prevent re-running initialization
+        # Prevent re-running __init__ on subsequent calls
         if hasattr(self, "_initialized") and self._initialized:
             return
 
