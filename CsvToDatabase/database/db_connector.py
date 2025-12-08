@@ -2,13 +2,12 @@ import pyodbc
 import pandas as pd
 from typing import Tuple, Optional, Dict
 import logging
-from CsvToDatabase.config.config_processor import ConfigProcessor
+from config.config_processor import ConfigProcessor as ConfigProcessor
 
 logger = logging.getLogger(__name__)
 
 
 class DBConnector:
-
     def __init__(self, config: ConfigProcessor):
         self.config = config
         self.connection_string = self._build_connection_string()

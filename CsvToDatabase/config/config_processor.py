@@ -23,7 +23,8 @@ class ConfigProcessor:
             'username': 'sa',
             'password': 'YourPassword123',
             'driver': 'ODBC Driver 17 for SQL Server',
-            'trusted_connection': 'no'
+            'trusted_connection': 'no',
+            'encrypt':'no'
         }
 
         self.config['IMPORT'] = {

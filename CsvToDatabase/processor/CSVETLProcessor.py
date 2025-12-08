@@ -2,9 +2,10 @@ import logging
 import sys
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from CsvToDatabase.config.config_processor import ConfigProcessor
-from CsvToDatabase.database.db_connector import DBConnector
-from CsvToDatabase.processor.file_processor import FileProcessor
+
+from config.config_processor import ConfigProcessor
+from database.db_connector import DBConnector
+from processor.file_processor import FileProcessor
 from typing import List
 
 # Configure logging

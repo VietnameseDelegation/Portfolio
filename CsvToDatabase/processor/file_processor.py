@@ -1,10 +1,9 @@
 import pandas as pd
 from pathlib import Path
 import logging
-from typing import List, Tuple, Dict, Any, Optional
+from typing import List, Tuple, Dict, Any
 from datetime import datetime
 import csv
-import threading
 import pyodbc
 
 logger = logging.getLogger(__name__)

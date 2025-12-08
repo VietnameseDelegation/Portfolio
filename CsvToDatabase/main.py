@@ -1,8 +1,8 @@
-from processor.CSVETLProcessor import CSVETLProcessor
 import multiprocessing as mp
 import argparse
 import time
 
+from processor.CSVETLProcessor import CSVETLProcessor
 
 
 def main():
@@ -13,7 +13,6 @@ def main():
     parser.add_argument('--config', default='config.ini', help='Path to configuration file')
 
     args = parser.parse_args()
-
     processor = CSVETLProcessor(args.config)
 
     if args.list_tables:
