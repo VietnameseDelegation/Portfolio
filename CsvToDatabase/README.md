@@ -1,4 +1,4 @@
-Here is a clearer and more complete version of your instructions:
+
 
 ---
 
@@ -36,5 +36,3 @@ python main.py --import
 This will start the import procedure using the CSV file located in the `input` directory.
 
 ---
-
-If you want, I can also create a full README file or describe the expected CSV structure.
