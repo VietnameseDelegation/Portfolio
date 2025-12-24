@@ -18,10 +18,10 @@ class ConfigProcessor:
     def create_default_config(self):
         """Create default configuration file if it doesn't exist"""
         self.config['DATABASE'] = {
-            'server': 'localhost',
-            'database': 'master',
-            'username': 'sa',
-            'password': 'YourPassword123',
+            'server': '',
+            'database': '',
+            'username': '',
+            'password': '',
             'driver': 'ODBC Driver 17 for SQL Server',
             'trusted_connection': 'no',
             'encrypt':'no'
@@ -35,10 +35,6 @@ class ConfigProcessor:
             'batch_size': '1000',
             'varchar_length': '255',
             'fast_executemany': 'true'
-        }
-
-        self.config['PARALLEL'] = {
-            'threads_per_process': '2'
         }
 
         self.config['EXPORT'] = {
