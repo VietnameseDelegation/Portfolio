@@ -11,6 +11,7 @@ class DBConnector:
     def __init__(self, config: ConfigProcessor):
         self.config = config
         self.connection_string = self._build_connection_string()
+
     def _build_connection_string(self) -> str:
         db_config = self.config.get_database_config()
         return (

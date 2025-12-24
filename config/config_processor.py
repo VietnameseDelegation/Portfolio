@@ -69,10 +69,5 @@ class ConfigProcessor:
         config_dict['fast_executemany'] = config_dict['fast_executemany'].lower() == 'true'
         return config_dict
 
-    def get_parallel_config(self) -> Dict[str, Any]:
-        config_dict = dict(self.config['PARALLEL'])
-        config_dict['threads_per_process'] = int(config_dict['threads_per_process'])
-        return config_dict
-
     def get_export_config(self) -> Dict[str, str]:
         return dict(self.config['EXPORT'])

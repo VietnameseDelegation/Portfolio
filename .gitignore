@@ -181,4 +181,4 @@ cython_debug/
 .cursorindexingignore
 .idea/
 config.ini
-CsvToDatabase/input/
+importModule/input/
