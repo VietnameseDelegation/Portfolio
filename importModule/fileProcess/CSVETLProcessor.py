@@ -5,7 +5,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from config.config_processor import ConfigProcessor
 from database.db_connector import DBConnector
-from processor.file_processor import FileProcessor
+from importModule.fileProcess.file_processor import FileProcessor
 from typing import List
 
 # Configure logging

@@ -19,7 +19,7 @@ class ConfigProcessor:
         """Create default configuration file if it doesn't exist"""
         self.config['DATABASE'] = {
             'server': '',
-            'database': '',
+            'database': 'OrderSystem',
             'username': '',
             'password': '',
             'driver': 'ODBC Driver 17 for SQL Server',
