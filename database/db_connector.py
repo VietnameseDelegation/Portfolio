@@ -37,41 +37,41 @@ class DBConnector:
         """Execute a query and return results as DataFrame if applicable"""
         conn = self.get_connection()
         try:
-            if query.strip().upper().startswith('SELECT'):
-                # Use pyodbc cursor directly to avoid pandas warning
-                cursor = conn.cursor()
-                if params:
-                    cursor.execute(query, params)
-                else:
-                    cursor.execute(query)
-
-                # Get column names
-                columns = [column[0] for column in cursor.description] if cursor.description else []
-
-                # Fetch all data
-                data = cursor.fetchall()
-
-                # Convert to DataFrame
-                if columns and data:
-                    df = pd.DataFrame.from_records(data, columns=columns)
-                else:
-                    df = pd.DataFrame()
-
-                return df
+            cursor = conn.cursor()
+            if params:
+                cursor.execute(query, params)
             else:
-                cursor = conn.cursor()
-                if params:
-                    cursor.execute(query, params)
-                else:
-                    cursor.execute(query)
-                conn.commit()
-                return None
+                cursor.execute(query)
+
+            # Iterate to find the first result set that has data
+            while True:
+                if cursor.description:
+                    columns = [column[0] for column in cursor.description]
+                    data = cursor.fetchall()
+                    conn.commit()
+                    if columns and data:
+                        return pd.DataFrame.from_records(data, columns=columns)
+                    else:
+                        return pd.DataFrame(columns=columns)
+                
+                if not cursor.nextset():
+                    break
+            
+            conn.commit()
+            return None
         except Exception as e:
-            conn.rollback()
+            # Check if conn is open before rollback/close if needed, but in this scope it's fine
+            try:
+                conn.rollback()
+            except:
+                pass
             logger.error(f"Query execution failed: {e}")
             raise
         finally:
-            conn.close()
+            try:
+                conn.close()
+            except:
+                pass
 
     def table_exists(self, table_name: str) -> bool:
         """Check if a table exists in the database"""
