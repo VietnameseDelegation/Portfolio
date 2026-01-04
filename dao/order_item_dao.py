@@ -1,6 +1,7 @@
-from typing import List, Dict
+from typing import List
 from database.db_connector import DBConnector
 from models.product import ProductDTO
+from models.order_item import OrderItemDTO
 
 class OrderItemDAO:
     def __init__(self, connector: DBConnector):
@@ -10,25 +11,19 @@ class OrderItemDAO:
         query = "INSERT INTO order_items (order_id, product_id, quantity, price_at_order) VALUES (?, ?, ?, ?)"
         self.connector.execute_query(query, (order_id, item.id, quantity, item.price))
 
-    def get_by_order_id(self, order_id: int) -> List[Dict]:
-        query = """
-            SELECT oi.product_id, p.name, oi.quantity, oi.price_at_order
-            FROM order_items oi
-            JOIN products p ON oi.product_id = p.id
-            WHERE oi.order_id = ?
-        """
+    def get_by_order_id(self, order_id: int) -> List[OrderItemDTO]:
+        query = "SELECT order_id, product_id, quantity, price_at_order FROM order_items WHERE order_id = ?"
         result = self.connector.execute_query(query, (order_id,))
         
         items = []
         if not result.empty:
             for _, row in result.iterrows():
-                items.append({
-                    "product_id": int(row['product_id']),
-                    "product_name": row['name'],
-                    "quantity": int(row['quantity']),
-                    "price": float(row['price_at_order']),
-                    "subtotal": int(row['quantity']) * float(row['price_at_order'])
-                })
+                items.append(OrderItemDTO(
+                    order_id=int(row['order_id']),
+                    product_id=int(row['product_id']),
+                    quantity=int(row['quantity']),
+                    price_at_order=float(row['price_at_order'])
+                ))
         return items
 
     def delete_by_order_id(self, order_id: int):

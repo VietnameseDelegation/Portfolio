@@ -7,6 +7,7 @@ from models.order import OrderDTO
 from dao.user_dao import UserDAO
 from dao.order_dao import OrderDAO
 from dao.order_item_dao import OrderItemDAO
+from dao.product_dao import ProductDAO
 
 class OrderService:
     def __init__(self, connector: DBConnector):
@@ -14,6 +15,7 @@ class OrderService:
         self.user_dao = UserDAO(connector)
         self.order_dao = OrderDAO(connector)
         self.item_dao = OrderItemDAO(connector)
+        self.product_dao = ProductDAO(connector)
 
     def create_order_process(self, user: UserDTO, status: str, items: List[ProductDTO], quantities: List[int]) -> int:
         if len(items) != len(quantities):
@@ -52,8 +54,27 @@ class OrderService:
         user = self.user_dao.get_by_id(order.user_id)
         
         # 3. Get Items
-        items = self.item_dao.get_by_order_id(order_id)
+        items_dtos = self.item_dao.get_by_order_id(order_id)
         
+        # 4. Get Products
+        product_ids = [item.product_id for item in items_dtos]
+        products = self.product_dao.get_by_ids(product_ids)
+        product_map = {p.id: p for p in products}
+
+        # 5. Aggregate
+        items = []
+        for item in items_dtos:
+            product = product_map.get(item.product_id)
+            product_name = product.name if product else "Unknown"
+            
+            items.append({
+                "product_id": item.product_id,
+                "product_name": product_name,
+                "quantity": item.quantity,
+                "price": item.price_at_order,
+                "subtotal": item.quantity * item.price_at_order
+            })
+            
         return {
             "order_id": order.id,
             "order_date": order.order_date,
