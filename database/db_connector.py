@@ -3,6 +3,7 @@ import pandas as pd
 from typing import Tuple, Optional, Dict
 import logging
 from config.config_processor import ConfigProcessor as ConfigProcessor
+from common.exceptions import DatabaseError
 
 logger = logging.getLogger(__name__)
 
@@ -13,16 +14,19 @@ class DBConnector:
         self.connection_string = self._build_connection_string()
 
     def _build_connection_string(self) -> str:
-        db_config = self.config.get_database_config()
-        return (
-            f"DRIVER={{{db_config['driver']}}};"
-            f"SERVER={db_config['server']};"
-            f"DATABASE={db_config['database']};"
-            f"UID={db_config['username']};"
-            f"PWD={db_config['password']};"
-            f"Trusted_Connection={db_config['trusted_connection']};"
-            f"Encrypt={db_config['encrypt']};"
-        )
+        try:
+            db_config = self.config.get_database_config()
+            return (
+                f"DRIVER={{{db_config['driver']}}};"
+                f"SERVER={db_config['server']};"
+                f"DATABASE={db_config['database']};"
+                f"UID={db_config['username']};"
+                f"PWD={db_config['password']};"
+                f"Trusted_Connection={db_config['trusted_connection']};"
+                f"Encrypt={db_config['encrypt']};"
+            )
+        except Exception as e:
+            raise DatabaseError(f"Failed to build connection string: {e}")
 
     def get_connection(self):
         """Get a new database connection"""
@@ -31,12 +35,16 @@ class DBConnector:
             return conn
         except pyodbc.Error as e:
             logger.error(f"Database connection failed: {e}")
-            raise
+            raise DatabaseError(f"Could not connect to database: {e}")
+        except Exception as e:
+            logger.error(f"Unexpected error connecting to database: {e}")
+            raise DatabaseError(f"Unexpected connection error: {e}")
 
     def execute_query(self, query: str, params: Tuple = None) -> Optional[pd.DataFrame]:
         """Execute a query and return results as DataFrame if applicable"""
-        conn = self.get_connection()
+        conn = None
         try:
+            conn = self.get_connection()
             cursor = conn.cursor()
             if params:
                 cursor.execute(query, params)
@@ -59,19 +67,28 @@ class DBConnector:
             
             conn.commit()
             return None
-        except Exception as e:
-            # Check if conn is open before rollback/close if needed, but in this scope it's fine
-            try:
-                conn.rollback()
-            except:
-                pass
+        except pyodbc.Error as e:
+            if conn:
+                try:
+                    conn.rollback()
+                except:
+                    pass
             logger.error(f"Query execution failed: {e}")
-            raise
+            raise DatabaseError(f"Error executing query: {e}")
+        except Exception as e:
+            if conn:
+                try:
+                    conn.rollback()
+                except:
+                    pass
+            logger.error(f"Unexpected error during query execution: {e}")
+            raise DatabaseError(f"Unexpected query error: {e}")
         finally:
-            try:
-                conn.close()
-            except:
-                pass
+            if conn:
+                try:
+                    conn.close()
+                except:
+                    pass
 
     def table_exists(self, table_name: str) -> bool:
         """Check if a table exists in the database"""
@@ -83,16 +100,22 @@ class DBConnector:
         try:
             result = self.execute_query(query, (table_name,))
             return result.iloc[0, 0] > 0
-        except:
+        except DatabaseError:
+            return False
+        except Exception:
             return False
 
     def create_table_from_schema(self, table_name: str, schema: Dict[str, str]):
         """Create a table based on the provided schema"""
-        columns = []
-        for col_name, col_type in schema.items():
-            columns.append(f"[{col_name}] {col_type}")
+        try:
+            columns = []
+            for col_name, col_type in schema.items():
+                columns.append(f"[{col_name}] {col_type}")
 
-        create_table_sql = f"CREATE TABLE [{table_name}] (\n    " + ",\n    ".join(columns) + "\n)"
+            create_table_sql = f"CREATE TABLE [{table_name}] (\n    " + ",\n    ".join(columns) + "\n)"
 
-        self.execute_query(create_table_sql)
-        logger.info(f"Created table: {table_name}")
+            self.execute_query(create_table_sql)
+            logger.info(f"Created table: {table_name}")
+        except Exception as e:
+            logger.error(f"Failed to create table {table_name}: {e}")
+            raise DatabaseError(f"Failed to create table {table_name}: {e}")

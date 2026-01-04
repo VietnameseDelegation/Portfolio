@@ -1,4 +1,5 @@
 from typing import List, Dict, Any, Optional
+from common.exceptions import ValidationError
 from datetime import datetime
 from database.db_connector import DBConnector
 from models.user import UserDTO
@@ -18,8 +19,19 @@ class OrderService:
         self.product_dao = ProductDAO(connector)
 
     def create_order_process(self, user: UserDTO, status: str, items: List[ProductDTO], quantities: List[int]) -> int:
+        # Validation
+        if not user.email or '@' not in user.email:
+             raise ValidationError("Invalid email address")
+             
+        if not items:
+            raise ValidationError("Order must contain at least one item")
+            
         if len(items) != len(quantities):
-            raise ValueError("Items and quantities must have the same length")
+            raise ValidationError("Items and quantities must have the same length")
+            
+        for qty in quantities:
+            if qty <= 0:
+                raise ValidationError("Quantity must be greater than zero")
 
         # 1. Handle User
         existing_user = self.user_dao.get_by_email(user.email)
