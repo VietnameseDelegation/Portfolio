@@ -183,3 +183,4 @@ cython_debug/
 config.ini
 importModule/input/
 /input
+/node_modules

@@ -35,8 +35,20 @@ class UserDAO:
             
         row = result.iloc[0]
         return UserDTO(
-            id=int(row['id']),
-            name=row['name'],
             email=row['email'],
             registered_at=row['registered_at']
         )
+
+    def get_all(self) -> list[UserDTO]:
+        query = "SELECT id, name, email, registered_at FROM users"
+        result = self.connector.execute_query(query)
+        users = []
+        if not result.empty:
+            for _, row in result.iterrows():
+                users.append(UserDTO(
+                    id=int(row['id']),
+                    name=row['name'],
+                    email=row['email'],
+                    registered_at=row['registered_at']
+                ))
+        return users

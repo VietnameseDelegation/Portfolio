@@ -33,3 +33,18 @@ class OrderDAO:
 
     def delete(self, order_id: int):
         self.connector.execute_query("DELETE FROM orders WHERE id = ?", (order_id,))
+
+    def get_all(self) -> list[OrderDTO]:
+        query = "SELECT id, user_id, order_date, status, paid FROM orders"
+        result = self.connector.execute_query(query)
+        orders = []
+        if not result.empty:
+            for _, row in result.iterrows():
+                orders.append(OrderDTO(
+                    id=int(row['id']),
+                    user_id=int(row['user_id']),
+                    order_date=row['order_date'],
+                    status=row['status'],
+                    paid=bool(row['paid'])
+                ))
+        return orders
