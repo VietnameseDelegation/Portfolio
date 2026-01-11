@@ -1,0 +1,27 @@
+{
+  "name": "databaseproject",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --prefix frontend\" \"venv\\Scripts\\python -m uvicorn api.main:app --reload\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VietnameseDelegation/Portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VietnameseDelegation/Portfolio/issues"
+  },
+  "homepage": "https://github.com/VietnameseDelegation/Portfolio#readme",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
