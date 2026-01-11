@@ -21,3 +21,8 @@ export interface Order {
     status: string;
     paid: boolean;
 }
+
+export interface Category {
+    id: number;
+    name: string;
+}

@@ -58,7 +58,6 @@ export function UsersPage() {
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Registered At</th>
@@ -66,10 +65,9 @@ export function UsersPage() {
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan={4}>Loading...</td></tr>
+                            <tr><td colSpan={3}>Loading...</td></tr>
                         ) : users.map(user => (
                             <tr key={user.id}>
-                                <td>{user.id}</td>
                                 <td>{user.name}</td>
                                 <td>{user.email}</td>
                                 <td>{new Date(user.registered_at).toLocaleDateString()}</td>

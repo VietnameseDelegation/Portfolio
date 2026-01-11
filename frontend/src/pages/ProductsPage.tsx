@@ -1,29 +1,36 @@
 import { useEffect, useState } from 'react';
-import type { Product } from '../types';
+import type { Product, Category } from '../types';
 import styles from '../common.module.css';
 import { Modal } from '../components/Modal';
 
 export function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newProduct, setNewProduct] = useState({ name: '', price: 0, category_id: 1, active: true });
 
-    const fetchProducts = () => {
-        fetch('http://localhost:8000/api/products/')
-            .then(res => res.json())
-            .then(data => {
-                setProducts(data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error(err);
-                setLoading(false);
-            });
+    const fetchData = () => {
+        setLoading(true);
+        Promise.all([
+            fetch('http://localhost:8000/api/products/').then(res => res.json()),
+            fetch('http://localhost:8000/api/products/categories').then(res => res.json())
+        ]).then(([productsData, categoriesData]) => {
+            setProducts(productsData);
+            setCategories(categoriesData);
+            setLoading(false);
+            // Default category ID to first one if available
+            if (categoriesData.length > 0) {
+                setNewProduct(prev => ({ ...prev, category_id: categoriesData[0].id }));
+            }
+        }).catch(err => {
+            console.error(err);
+            setLoading(false);
+        });
     };
 
     useEffect(() => {
-        fetchProducts();
+        fetchData();
     }, []);
 
     const handleCreateProduct = async (e: React.FormEvent) => {
@@ -36,8 +43,12 @@ export function ProductsPage() {
             });
             if (res.ok) {
                 setIsModalOpen(false);
-                setNewProduct({ name: '', price: 0, category_id: 1, active: true });
-                fetchProducts();
+                // Reset form but keep last selected category or default
+                setNewProduct(prev => ({ name: '', price: 0, category_id: prev.category_id, active: true }));
+                // Re-fetch only products
+                fetch('http://localhost:8000/api/products/')
+                    .then(r => r.json())
+                    .then(d => setProducts(d));
             } else {
                 alert('Failed to create product');
             }
@@ -45,6 +56,11 @@ export function ProductsPage() {
             console.error(error);
             alert('Error creating product');
         }
+    };
+
+    const getCategoryName = (id: number) => {
+        const cat = categories.find(c => c.id === id);
+        return cat ? cat.name : id;
     };
 
     return (
@@ -58,22 +74,20 @@ export function ProductsPage() {
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Name</th>
                             <th>Price</th>
-                            <th>Category ID</th>
+                            <th>Category</th>
                             <th>Active</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan={5}>Loading...</td></tr>
+                            <tr><td colSpan={4}>Loading...</td></tr>
                         ) : products.map(product => (
                             <tr key={product.id}>
-                                <td>{product.id}</td>
                                 <td>{product.name}</td>
                                 <td>${product.price.toFixed(2)}</td>
-                                <td>{product.category_id}</td>
+                                <td>{getCategoryName(product.category_id)}</td>
                                 <td>{product.active ? 'Yes' : 'No'}</td>
                             </tr>
                         ))}
@@ -105,14 +119,16 @@ export function ProductsPage() {
                         />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Category ID</label>
-                        <input
-                            type="number"
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Category</label>
+                        <select
                             value={newProduct.category_id}
                             onChange={e => setNewProduct({ ...newProduct, category_id: parseInt(e.target.value) })}
-                            required
                             style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #333', backgroundColor: '#333', color: '#fff' }}
-                        />
+                        >
+                            {categories.map(cat => (
+                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

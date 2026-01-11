@@ -5,9 +5,20 @@ from pydantic import BaseModel
 from api.dependencies import get_db_connector
 from database.db_connector import DBConnector
 from dao.product_dao import ProductDAO
+from dao.category_dao import CategoryDAO
 from models.product import ProductDTO
+from models.category import CategoryDTO
 
 router = APIRouter()
+
+class CategoryResponse(BaseModel):
+    id: int
+    name: str
+
+@router.get("/categories", response_model=List[CategoryResponse])
+def get_categories(db: DBConnector = Depends(get_db_connector)):
+    dao = CategoryDAO(db)
+    return dao.get_all()
 
 class ProductCreate(BaseModel):
     name: str

@@ -29,8 +29,6 @@ export function OrdersPage() {
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>User ID</th>
                             <th>Date</th>
                             <th>Status</th>
                             <th>Paid</th>
@@ -38,11 +36,9 @@ export function OrdersPage() {
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan={5}>Loading...</td></tr>
+                            <tr><td colSpan={3}>Loading...</td></tr>
                         ) : orders.map(order => (
                             <tr key={order.id}>
-                                <td>{order.id}</td>
-                                <td>{order.user_id}</td>
                                 <td>{new Date(order.order_date).toLocaleDateString()}</td>
                                 <td>
                                     <span style={{
