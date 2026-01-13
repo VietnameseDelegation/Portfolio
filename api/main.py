@@ -7,8 +7,14 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.routes import users, products, orders, etl
+from config.config_processor import ConfigProcessor
 
 app = FastAPI(title="OrderSystem API")
+
+@app.on_event("startup")
+async def startup_event():
+    # Ensure config exists on startup
+    ConfigProcessor('config.ini')
 
 # Configure CORS
 app.add_middleware(
