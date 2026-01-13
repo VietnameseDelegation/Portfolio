@@ -63,8 +63,13 @@ encrypt = no
 
 ### Database Schema
 Initialize your database using the provided schema file:
-1.  Open `schema.sql`.
-2.  Execute the script in your SQL Server instance to create the necessary tables (`users`, `products`, `orders`, etc.).
+1.  Open `schema.sql` in a text editor.
+2.  Copy the entire content.
+3.  Open **Microsoft SQL Server Management Studio (SSMS)** or your preferred SQL tool.
+4.  Connect to your database server.
+5.  Open a **New Query** window.
+6.  **Paste** the copied SQL script.
+7.  Click **Execute** (or press F5) to create the database, tables, and views.
 
 ## Running the Application
 
